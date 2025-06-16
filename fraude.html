@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONEE - Gestion des Fraudes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .director-info {
+            text-align: right;
+            color: #333;
+        }
+
+        .director-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Title Section */
+        .title-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .title-section h1 {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navigation */
+        .navigation {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .fraudes-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .fraudes-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .fraudes-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .fraudes-table tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 15px;
+        }
+
+        /* Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .detail-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .comment-section {
+            margin-top: 20px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .nav-item {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-filters {
+                justify-content: center;
+            }
+
+            .search-input {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .title-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">ONEE</div>
+                <div>
+                    <h2>Office National de l'Électricité et de l'Eau potable</h2>
+                </div>
+            </div>
+            <div class="director-info">
+                <div class="director-name">M. Hassan BENALI</div>
+                <div>Directeur Régional</div>
+            </div>
+        </div>
+
+        <!-- Title Section -->
+        <div class="title-section">
+            <h1>Gestion des Fraudes</h1>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <div class="nav-menu">
+                <a href="#" class="nav-item">Accueil</a>
+                <a href="#" class="nav-item">Missions</a>
+                <a href="#" class="nav-item">Carte</a>
+                <a href="#" class="nav-item active">Fraudes</a>
+                <a href="#" class="nav-item">Budget</a>
+                <a href="#" class="nav-item">Déconnexion</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Controls -->
+            <div class="controls">
+                <div class="search-filters">
+                    <input type="text" class="search-input" placeholder="Rechercher par ID, collaborateur..." id="searchInput">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Tous les statuts</option>
+                        <option value="pending">Pending</option>
+                        <option value="resolved">Résolu</option>
+                    </select>
+                    <select class="filter-select" id="typeFilter">
+                        <option value="">Tous les types</option>
+                        <option value="retour">Retour prématuré</option>
+                        <option value="trajet">Trajet non conforme</option>
+                        <option value="localisation">Localisation suspecte</option>
+                    </select>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-secondary" onclick="exportData('csv')">Exporter CSV</button>
+                    <button class="btn btn-primary" onclick="exportData('pdf')">Exporter PDF</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="fraudes-table" id="fraudesTable">
+                    <thead>
+                        <tr>
+                            <th>ID Fraude</th>
+                            <th>Mission</th>
+                            <th>Collaborateur(s)</th>
+                            <th>Type de fraude</th>
+                            <th>Date/Heure</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>001</strong></td>
+                            <td>M123</td>
+                            <td>Aya Ait S</td>
+                            <td>Retour prématuré</td>
+                            <td>16/06/2025 10:15</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary btn-small" onclick="showDetails('001')">Voir détails</button>
+                                    <button class="btn btn-secondary btn-small" onclick="markResolved('001')">Marquer résolu</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>002</strong></td>
+                            <td>M124</td>
+                            <td>Ahmed B</td>
+                            <td>Trajet non conforme</td>
+                            <td>15/06/2025 14:20</td>
+                            <td><span class="status-badge status-resolved">Résolu</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary btn-small" onclick="showDetails('002')">Voir détails</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>003</strong></td>
+                            <td>M125</td>
+                            <td>Fatima Z</td>
+                            <td>Localisation suspecte</td>
+                            <td>14/06/2025 09:30</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary btn-small" onclick="showDetails('003')">Voir détails</button>
+                                    <button class="btn btn-secondary btn-small" onclick="markResolved('003')">Marquer résolu</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>004</strong></td>
+                            <td>M126</td>
+                            <td>Omar K</td>
+                            <td>Retour prématuré</td>
+                            <td>13/06/2025 16:45</td>
+                            <td><span class="status-badge status-resolved">Résolu</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary btn-small" onclick="showDetails('004')">Voir détails</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 ONEE - Office National de l'Électricité et de l'Eau potable. Tous droits réservés.</p>
+            <p>Système de gestion des missions et surveillance des fraudes</p>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Détails de la Fraude</h2>
+            
+            <div class="detail-section">
+                <h3>Description de la fraude</h3>
+                <div class="detail-content" id="fraudDescription">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Données GPS et Trajets</h3>
+                <div class="detail-content" id="gpsData">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+
+            <div class="comment-section">
+                <h3>Ajouter un commentaire</h3>
+                <textarea class="comment-input" placeholder="Saisissez votre commentaire..."></textarea>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="saveComment()">Enregistrer commentaire</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données de fraudes pour la démo
+        const fraudesData = {
+            '001': {
+                description: 'Le collaborateur Aya Ait S a signalé un retour anticipé de sa mission M123 à 10:15 alors que la mission était prévue jusqu\'à 12:00. L\'analyse des données GPS montre une inactivité prolongée sur le terrain.',
+                gps: 'Position attendue: 33.5731° N, 7.5898° W (Casablanca Centre)<br>Position réelle: 33.5731° N, 7.5898° W<br>Temps d\'arrêt: 45 minutes<br>Distance parcourue: 2.3 km (attendu: 8.5 km)'
+            },
+            '002': {
+                description: 'Ahmed B a effectué un trajet non conforme lors de sa mission M124. Le système a détecté des déviations importantes par rapport à l\'itinéraire prévu.',
+                gps: 'Itinéraire prévu: Route directe A → B (12 km)<br>Itinéraire réel: Route A → C → D → B (18 km)<br>Temps supplémentaire: 35 minutes<br>Justification fournie: Embouteillages'
+            },
+            '003': {
+                description: 'Fatima Z s\'est trouvée dans une localisation suspecte ne correspondant pas à sa zone de mission assignée.',
+                gps: 'Zone de mission: Secteur Nord (Rabat)<br>Position détectée: Secteur Sud (Salé)<br>Durée hors zone: 1h 20min<br>Statut: En cours d\'investigation'
+            },
+            '004': {
+                description: 'Omar K a signalé un retour prématuré de sa mission en raison de conditions météorologiques. Vérification effectuée et justification acceptée.',
+                gps: 'Mission interrompue à 16:45<br>Raison: Pluies torrentielles<br>Confirmation météo: Validée<br>Statut: Fraude écartée'
+            }
+        };
+
+        // Fonction pour afficher les détails
+        function showDetails(id) {
+            const modal = document.getElementById('detailsModal');
+            const data = fraudesData[id];
+            
+            document.getElementById('modalTitle').textContent = `Détails de la Fraude ${id}`;
+            document.getElementById('fraudDescription').innerHTML = data.description;
+            document.getElementById('gpsData').innerHTML = data.gps;
+            
+            modal.style.display = 'block';
+        }
+
+        // Fonction pour fermer la modal
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        // Fermer la modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailsModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Fonction pour marquer comme résolu
+        function markResolved(id) {
+            if (confirm('Êtes-vous sûr de vouloir marquer cette fraude comme résolue ?')) {
+                const row = event.target.closest('tr');
+                const statusCell = row.querySelector('.status-badge');
+                statusCell.textContent = 'Résolu';
+                statusCell.className = 'status-badge status-resolved';
+                
+                // Mettre à jour les boutons d'action
+                const actionButtons = row.querySelector('.action-buttons');
+                actionButtons.innerHTML = '<button class="btn btn-primary btn-small" onclick="showDetails(\'' + id + '\')">Voir détails</button>';
+                
+                // Animation de succès
+                row.style.backgroundColor = '#d4edda';
+                setTimeout(() => {
+                    row.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+
+        // Fonction pour exporter les données
+        function exportData(format) {
+            alert(`Export ${format.toUpperCase()} en cours de préparation...`);
+            // Ici, vous pourriez implémenter la logique d'export réelle
+        }
+
+        // Fonction pour sauvegarder un commentaire
+        function saveComment() {
+            const comment = document.querySelector('.comment-input').value;
+            if (comment.trim()) {
+                alert('Commentaire enregistré avec succès !');
+                document.querySelector('.comment-input').value = '';
+            } else {
+                alert('Veuillez saisir un commentaire.');
+            }
+        }
+
+        // Fonctions de recherche et filtrage
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+        document.getElementById('typeFilter').addEventListener('change', filterTable);
+
+        function filterTable() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#fraudesTable tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const id = cells[0].textContent.toLowerCase();
+                const mission = cells[1].textContent.toLowerCase();
+                const collaborateur = cells[2].textContent.toLowerCase();
+                const type = cells[3].textContent.toLowerCase();
+                const status = cells[5].textContent.toLowerCase();
+                
+                const matchesSearch = id.includes(searchValue) || 
+                                    mission.includes(searchValue) || 
+                                    collaborateur.includes(searchValue);
+                
+                const matchesStatus = !statusFilter || status.includes(statusFilter);
+                const matchesType = !typeFilter || type.includes(typeFilter);
+                
+                if (matchesSearch && matchesStatus && matchesType) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Animation d'entrée pour les éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.header, .title-section, .navigation, .main-content');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
