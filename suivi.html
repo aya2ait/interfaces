@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONEE - Suivi des véhicules en temps réel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .director-name {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Title Section */
+        .title-section {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 3px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .title-section h1 {
+            color: #1f2937;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .navigation {
+            background: #374151;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-menu li {
+            border-right: 1px solid #4b5563;
+        }
+
+        .nav-menu li:last-child {
+            margin-left: auto;
+            border-right: none;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background-color: #1f2937;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Map Section */
+        .map-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .map-container {
+            height: 500px;
+            background: linear-gradient(45deg, #e8f4fd, #b3d9f5);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #e5e7eb;
+        }
+
+        .map-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Vehicle Icons */
+        .vehicle-icon {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .vehicle-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .vehicle-1 { top: 180px; left: 200px; }
+        .vehicle-2 { top: 250px; left: 350px; background: #10b981; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); }
+        .vehicle-3 { top: 320px; left: 180px; background: #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); }
+        .vehicle-4 { top: 200px; left: 450px; background: #8b5cf6; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4); }
+
+        /* Popup */
+        .popup {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-width: 300px;
+            z-index: 100;
+            border: 1px solid #e5e7eb;
+        }
+
+        .popup h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .popup-info {
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .popup-info strong {
+            color: #374151;
+        }
+
+        .popup button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .popup button:hover {
+            background: #2563eb;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .filters h3 {
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-item select, .filter-item input {
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .filter-item label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* Alerts */
+        .alerts-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .alerts-section h3 {
+            color: #dc2626;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-item {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-item strong {
+            color: #dc2626;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+            }
+
+            .nav-menu li {
+                border-right: none;
+                border-bottom: 1px solid #4b5563;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🏢 ONEE</div>
+        <div class="director-name">M. Ahmed BENNANI - Directeur</div>
+    </header>
+
+    <!-- Title Section -->
+    <div class="title-section">
+        <h1>Suivi en temps réel des véhicules en mission</h1>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navigation">
+        <ul class="nav-menu">
+            <li><a href="#" class="active">🏠 Accueil</a></li>
+            <li><a href="#">📋 Missions</a></li>
+            <li><a href="#">🗺️ Carte</a></li>
+            <li><a href="#">⚠️ Fraudes</a></li>
+            <li><a href="#">💰 Budget</a></li>
+            <li><a href="#">🚪 Déconnexion</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Map Section -->
+        <section class="map-section">
+            <div class="map-container">
+                <div class="map-title">Carte du Maroc - Véhicules en temps réel</div>
+                
+                <!-- Vehicle Icons -->
+                <div class="vehicle-icon vehicle-1" onclick="showPopup(event, 'popup1')">🚗</div>
+                <div class="vehicle-icon vehicle-2" onclick="showPopup(event, 'popup2')">🚙</div>
+                <div class="vehicle-icon vehicle-3" onclick="showPopup(event, 'popup3')">🚐</div>
+                <div class="vehicle-icon vehicle-4" onclick="showPopup(event, 'popup4')">🚛</div>
+
+                <!-- Popups -->
+                <div id="popup1" class="popup">
+                    <h3>Véhicule MAR-001-A</h3>
+                    <div class="popup-info"><strong>Collaborateur :</strong> Mohammed ALAMI</div>
+                    <div class="popup-info"><strong>Mission :</strong> Inspection réseau électrique</div>
+                    <div class="popup-info"><strong>Dates :</strong> 15/06/2025 - 17/06/2025</div>
+                    <div class="popup-info"><strong>Vitesse :</strong> 45 km/h</div>
+                    <div class="popup-info"><strong>Consommation :</strong> 8.2L/100km</div>
+                    <button onclick="viewMissionDetails('MAR-001-A')">Voir détails de la mission</button>
+                </div>
+
+                <div id="popup2" class="popup">
+                    <h3>Véhicule MAR-002-B</h3>
+                    <div class="popup-info"><strong>Collaborateurs :</strong> Fatima BENALI, Omar KADIRI</div>
+                    <div class="popup-info"><strong>Mission :</strong> Maintenance transformateur</div>
+                    <div class="popup-info"><strong>Dates :</strong> 16/06/2025 - 16/06/2025</div>
+                    <div class="popup-info"><strong>Vitesse :</strong> 0 km/h (Arrêté)</div>
+                    <div class="popup-info"><strong>Consommation :</strong> 0L/100km</div>
+                    <button onclick="viewMissionDetails('MAR-002-B')">Voir détails de la mission</button>
+                </div>
+
+                <div id="popup3" class="popup">
+                    <h3>Véhicule MAR-003-C</h3>
+                    <div class="popup-info"><strong>Collaborateur :</strong> Youssef TAZI</div>
+                    <div class="popup-info"><strong>Mission :</strong> Relevé compteurs</div>
+                    <div class="popup-info"><strong>Dates :</strong> 16/06/2025 - 18/06/2025</div>
+                    <div class="popup-info"><strong>Vitesse :</strong> 32 km/h</div>
+                    <div class="popup-info"><strong>Consommation :</strong> 12.5L/100km</div>
+                    <button onclick="viewMissionDetails('MAR-003-C')">Voir détails de la mission</button>
+                </div>
+
+                <div id="popup4" class="popup">
+                    <h3>Véhicule MAR-004-D</h3>
+                    <div class="popup-info"><strong>Collaborateurs :</strong> Aicha MOUSSAOUI, Hassan BENKIRANE</div>
+                    <div class="popup-info"><strong>Mission :</strong> Transport matériel</div>
+                    <div class="popup-info"><strong>Dates :</strong> 16/06/2025 - 16/06/2025</div>
+                    <div class="popup-info"><strong>Vitesse :</strong> 65 km/h</div>
+                    <div class="popup-info"><strong>Consommation :</strong> 15.8L/100km</div>
+                    <button onclick="viewMissionDetails('MAR-004-D')">Voir détails de la mission</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters">
+            <h3>🔍 Filtres</h3>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="direction">Direction/Région :</label>
+                    <select id="direction">
+                        <option value="">Toutes les directions</option>
+                        <option value="casablanca">Casablanca</option>
+                        <option value="rabat">Rabat</option>
+                        <option value="marrakech">Marrakech</option>
+                        <option value="fes">Fès</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="vehicles-mission" checked>
+                    <label for="vehicles-mission">Véhicules en mission</label>
+                </div>
+                <div class="filter-item">
+                    <input type="checkbox" id="alerts" checked>
+                    <label for="alerts">Afficher les alertes</label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alerts Section -->
+        <section class="alerts-section">
+            <h3>⚠️ Alertes de fraudes détectées</h3>
+            <div class="alert-item">
+                <strong>Mission INSP-2025-156 :</strong> Retour prématuré détecté - Collaborateur Mohammed ALAMI
+                <br><small>Détecté le 16/06/2025 à 14:30</small>
+            </div>
+            <div class="alert-item">
+                <strong>Mission MAINT-2025-089 :</strong> Trajet dévié suspecté - Véhicule MAR-005-E
+                <br><small>Détecté le 16/06/2025 à 11:45</small>
+            </div>
+            <div class="alert-item">
+                <strong>Mission RELEVE-2025-234 :</strong> Consommation carburant anormale - Véhicule MAR-007-G
+                <br><small>Détecté le 15/06/2025 à 16:20</small>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 ONEE - Office National de l'Électricité et de l'Eau potable</p>
+        <p>Tous droits réservés - Système de suivi des véhicules v2.1</p>
+    </footer>
+
+    <script>
+        function showPopup(event, popupId) {
+            // Hide all popups
+            const popups = document.querySelectorAll('.popup');
+            popups.forEach(popup => popup.style.display = 'none');
+            
+            // Show the selected popup
+            const popup = document.getElementById(popupId);
+            popup.style.display = 'block';
+            
+            // Position the popup near the clicked vehicle
+            const rect = event.target.getBoundingClientRect();
+            const mapRect = event.target.closest('.map-container').getBoundingClientRect();
+            
+            popup.style.left = (event.target.offsetLeft + 30) + 'px';
+            popup.style.top = (event.target.offsetTop - 10) + 'px';
+        }
+
+        function viewMissionDetails(vehicleId) {
+            alert(`Affichage des détails de la mission pour le véhicule ${vehicleId}`);
+        }
+
+        // Close popups when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.vehicle-icon') && !event.target.closest('.popup')) {
+                const popups = document.querySelectorAll('.popup');
+                popups.forEach(popup => popup.style.display = 'none');
+            }
+        });
+
+        // Filter functionality
+        document.getElementById('vehicles-mission').addEventListener('change', function() {
+            const vehicles = document.querySelectorAll('.vehicle-icon');
+            vehicles.forEach(vehicle => {
+                vehicle.style.display = this.checked ? 'flex' : 'none';
+            });
+        });
+
+        document.getElementById('alerts').addEventListener('change', function() {
+            const alertsSection = document.querySelector('.alerts-section');
+            alertsSection.style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>
